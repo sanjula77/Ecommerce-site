@@ -8,10 +8,12 @@ use App\Models\User;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Hash;
 
-
 class authController extends Controller
 {
     function login(){
+        if(Auth::check()){
+            return redirect(route('home'));
+        }
         return view('authentication.login');
     }
     function loginPost(Request $request){
@@ -22,12 +24,15 @@ class authController extends Controller
 
         $credentials = $request->only('email', 'password');
         if(Auth::attempt($credentials)){
-            return redirect()->intended('home');
+            return redirect(route('home'));
         }
         return redirect(route('login'))->with("error", "Login failed");
     }
 
     function registration(){
+        if(Auth::check()){
+            return redirect(route('home'));
+        }
         return view('authentication.register');
     }
 
@@ -48,8 +53,8 @@ class authController extends Controller
         return redirect(route('login'))->with("success", "Successfully registered");
     }
     function logout() {
-        Session::flash();
+        Session::flash('success', 'You have successfully logged out.');
         Auth::logout();
-        return redirect()->route('login');  // Redirect to login page after logout.
+        return redirect()->route('login'); 
     }
 }
