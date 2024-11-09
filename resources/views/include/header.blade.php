@@ -1,6 +1,6 @@
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
   <div class="container">
-    <a class="navbar-brand fs-2" href="#">Offcanvas navbar</a>
+    <a class="navbar-brand fs-2" href="#">{{config('app.name')}}</a>
     <button class="navbar-toggler shadow-none border-0" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -23,6 +23,20 @@
           <li class="nav-item mx-2">
             <a class="nav-link" href="#">Contact</a>
           </li>
+          @auth
+          <li class="nav-item mx-2 pt-2">
+              @auth
+              <span class="text-white">{{ auth()->user()->name }} </span>
+              @endauth
+          </li>
+          <li class="nav-item mx-2">
+            <a class="nav-link text-danger" href="{{route('logout')}}">Log out</a>
+          </li>
+          @else
+          <li class="nav-item mx-2">
+            <a class="nav-link active" aria-current="page" href="{{route('logout')}}">Login</a>
+          </li>
+          @endauth
         </ul>
       </div>
     </div>
