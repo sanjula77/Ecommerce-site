@@ -3,20 +3,20 @@
 @section('csss')
 <style>
     .card {
-      margin: 15px 0; /* Add spacing between cards */
+      margin: 15px 0;
     }
   
     .card-body {
-      background-color: #f8f9fa; /* Light background */
-      padding: 20px; /* Add some padding */
-      border-radius: 8px; /* Rounded corners */
-      box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); /* Soft shadow */
-      text-align: center; /* Center text */
-      transition: transform 0.2s ease; /* Smooth transition for hover effect */
+      background-color: #f8f9fa;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+      text-align: center;
+      transition: transform 0.2s ease;
     }
   
     .card-body:hover {
-      transform: scale(1.05); /* Slightly enlarge card on hover */
+      transform: scale(1.05);
     }
   
     .card-title {
@@ -36,41 +36,67 @@
       border-radius: 8px;
       margin-bottom: 15px;
     }
-  </style>
-@endsection
-@section('content')
-  
-  <div class="container text-center">
-    <div class="row justify-content-center">
-      <div class="col-3">
-        <div class="card">
-          <img src="https://ae-pic-a1.aliexpress-media.com/kf/S0c59735be25143fea361085392704e2bf/Nylon-Handbags-Shoulder-Bag-Large-Capacity-Crossbody-Bags-for-Teenager-Girls-Men-Harajuku-Messenger-Bag-Student.jpg_640x640Q90.jpg_.webp" class="card-img-top" alt="Item 1 Image">
-          <div class="card-body">
-            <h5 class="card-title">Item 1</h5>
-            <p class="card-text">This is a description for Item 1. It provides more details about the item.</p>
-          </div>
-        </div>
-      </div>
-      <div class="col-3">
-        <div class="card">
-         <img src="https://ae-pic-a1.aliexpress-media.com/kf/Se3d4e90fa9b049bda24b6ca179c46964j/ITAMOOD-Genuine-Leather-Women-s-Bag-Luxury-Branded-Women-s-Handbag-Fashionable-and-Versatile-Crossbody-Bag.jpg_640x640Q90.jpg_.webp" class="card-img-top" alt="Item 2 Image">
-          <div class="card-body">
-            <h5 class="card-title">Item 2</h5>
-            <p class="card-text">This is a description for Item 2. It provides more details about the item.</p>
-          </div>
-        </div>
-      </div>
-      <div class="col-3">
-        <div class="card">
-         <img src="https://ae-pic-a1.aliexpress-media.com/kf/S68156e6fee404f6180570a5433a262d6J/Large-Capacity-Canvas-Solid-Letter-Tote-Bag-Versatile-Handbag-For-Commuter-Work-Student-Class-Underarm-Women.jpg_640x640Q90.jpg_.webp" class="card-img-top" alt="Item 3 Image">
-          <div class="card-body">
-            <h5 class="card-title">Item 3</h5>
-            <p class="card-text">This is a description for Item 3. It provides more details about the item.</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-  
 
+    .price-section {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 15px;
+      font-weight: bold;
+      font-size: 1rem;
+      color: #333;
+    }
+
+    .price-section .price {
+      font-size: 1.2rem;
+      color: #333;
+      margin-right: 40px; 
+    }
+
+    .cart-icon {
+      width: 24px;
+      height: 24px;
+      margin-left: 30px; 
+    }
+
+    .buy-now-btn {
+      margin-top: 15px;
+      padding: 10px;
+      background-color: #333;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      width: 100%;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    .buy-now-btn:hover {
+      background-color: #555;
+    }
+</style>
+@endsection
+
+@section('content')
+<div class="container text-center">
+  <div class="row justify-content-center">
+     @foreach($items as $item)
+        <div class="col-3 mb-4">
+            <div class="card">
+              <img src="{{ asset('storage/' . $item->image_path) }}" class="card-img-top" alt="{{ $item->name }} Image">
+                <div class="card-body">
+                    <h5 class="card-title">{{ $item->name }}</h5>
+                    <p class="card-text">{{ $item->description }}</p>
+                    <div class="price-section">
+                        <span class="price">LKR.{{ $item->price }}</span>
+                        <img src="https://www.iconpacks.net/icons/2/free-icon-add-to-cart-3046.png" alt="Add to Cart Icon" class="cart-icon">
+                    </div>
+                    <button class="btn btn-primary buy-now-btn">Buy Now</button>
+                </div>
+            </div>
+        </div>
+        @endforeach
+  </div>
+</div>
 @endsection

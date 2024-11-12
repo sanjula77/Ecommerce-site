@@ -3,10 +3,13 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Item;
 
 class productController extends Controller
 {
     function cards(){
-        return view('products.item');
+        $items = Item::all();
+        return view('products.item', ['items' => $items]);
+        
     }
 }
