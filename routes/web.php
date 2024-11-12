@@ -1,7 +1,9 @@
 <?php
 
+use App\Http\Controllers\adminController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\authController;
+use App\Http\Controllers\productController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -21,3 +23,9 @@ Route::group(['middleware' => 'auth'],function(){
         return "Hello";
     });
 });
+
+Route::get('/product', [productController::class, 'cards'])->name('products');
+
+Route::get('/admin', [adminController::class, 'admin'])->name('admin');
+
+Route::post('/admin', [adminController::class, 'insertData'])->name('insert.post');
