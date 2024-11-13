@@ -5,7 +5,6 @@
     .card {
       margin: 15px 0;
     }
-  
     .card-body {
       background-color: #f8f9fa;
       padding: 20px;
@@ -29,13 +28,13 @@
       font-size: 0.9rem;
       color: #555;
     }
-  
-    .card-img-top {
-      width: 100%;
-      height: auto;
-      border-radius: 8px;
-      margin-bottom: 15px;
-    }
+  .card-img-top {
+    width: 100%;
+    height: 300px; 
+     
+    border-radius: 8px;
+    margin-bottom: 15px;
+}
 
     .price-section {
       display: flex;
@@ -80,23 +79,29 @@
 
 @section('content')
 <div class="container text-center">
-  <div class="row justify-content-center">
-     @foreach($items as $item)
-        <div class="col-3 mb-4">
-            <div class="card">
-              <img src="{{ asset('storage/' . $item->image_path) }}" class="card-img-top" alt="{{ $item->name }} Image">
-                <div class="card-body">
-                    <h5 class="card-title">{{ $item->name }}</h5>
-                    <p class="card-text">{{ $item->description }}</p>
-                    <div class="price-section">
-                        <span class="price">LKR.{{ $item->price }}</span>
-                        <img src="https://www.iconpacks.net/icons/2/free-icon-add-to-cart-3046.png" alt="Add to Cart Icon" class="cart-icon">
-                    </div>
-                    <button class="btn btn-primary buy-now-btn">Buy Now</button>
-                </div>
-            </div>
-        </div>
-        @endforeach
-  </div>
+    <div class="row justify-content-center">
+       @foreach($items as $item)
+          <div class="col-3 mb-4">
+              <div class="card">
+                <img src="{{ asset('storage/' . $item->image_path) }}" class="card-img-top" alt="{{ $item->name }} Image">
+                  <div class="card-body">
+                      <h5 class="card-title">{{ $item->name }}</h5>
+                      <p class="card-text">{{ $item->description }}</p>
+                      <div class="price-section">
+                          <span class="price">LKR.{{ $item->price }}</span>
+                          <form action="{{ route('cart.add', $item->id) }}" method="POST" style="display:inline;">
+                              @csrf
+                              <button type="submit" class="btn p-0" style="background:none; border:none;">
+                                  <img src="https://www.iconpacks.net/icons/2/free-icon-add-to-cart-3046.png" alt="Add to Cart Icon" class="cart-icon">
+                              </button>
+                          </form>
+                      </div>
+                      <button class="btn btn-primary buy-now-btn">Buy Now</button>
+                  </div>
+              </div>
+          </div>
+       @endforeach
+    </div>
 </div>
+
 @endsection
