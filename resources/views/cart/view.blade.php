@@ -85,7 +85,7 @@
                     <h5 class="final-total">${{ number_format($total + 5, 2) }}</h5> <!-- Assume $5 for shipping as default -->
                 </div>
 
-                <a href="#" class="btn btn-primary btn-block">Checkout</a>
+                <a href="{{route('checkout.customerDetails')}}" class="btn btn-primary btn-block">Checkout</a>
             </div>
         </div>
 
