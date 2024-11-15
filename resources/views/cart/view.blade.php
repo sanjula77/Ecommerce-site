@@ -50,7 +50,7 @@
                 @endforeach
             @endif
 
-            <a href="#" class="text-primary"><i class="fas fa-arrow-left"></i> Continue Shopping</a>
+            <a href="{{route('products')}}" class="text-primary"><i class="fas fa-arrow-left"></i> Continue Shopping</a>
         </div>
 
         <!-- Order Summary Section -->
@@ -82,7 +82,7 @@
                 
                 <div class="d-flex justify-content-between mb-4">
                     <h5>Total Cost</h5>
-                    <h5 class="final-total">${{ number_format($total + 5, 2) }}</h5> <!-- Assume $5 for shipping as default -->
+                    <h5 class="final-total">LKR{{ number_format($total + 5, 2) }}</h5> <!-- Assume $5 for shipping as default -->
                 </div>
 
                 <a href="{{route('checkout.customerDetails')}}" class="btn btn-primary btn-block">Checkout</a>

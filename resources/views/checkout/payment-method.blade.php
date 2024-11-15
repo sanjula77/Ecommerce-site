@@ -113,7 +113,7 @@
     <div class="payment-container">
         <h3>Payment Method</h3>
 
-        <form action="{{ route('checkout.paymentMethod') }}" method="POST">
+        <form action="{{ route('checkout.confirmation') }}" method="POST">
             @csrf
             
             <!-- Card Number -->
@@ -142,8 +142,8 @@
 
             <!-- Amount -->
             <div class="form-group">
-                <label for="amount">Amount (LKR)</label>
-                <input type="number" name="amount" id="amount" class="form-control" placeholder="Enter amount" required>
+                <label for="amount">Amount</label>
+                <input type="text" name="amount" id="amount" class="form-control" value="LKR {{ $totalAmount }}.00" placeholder="Enter amount" required>
             </div>
 
             <!-- Submit Button -->

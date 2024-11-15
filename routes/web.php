@@ -49,10 +49,18 @@ Route::delete('/cart/{id}', [CartController::class, 'destroy'])->name('cart.dest
 
 
 // Checkout section
-Route::get('/checkout/customer-details', [CheckoutController::class, 'showCustomerDetails'])->name('checkout.customerDetails');
-Route::post('/checkout/customer-details', [CheckoutController::class, 'saveCustomerDetails']);
+Route::middleware(['auth'])->group(function () {
+    Route::get('/checkout/customer-details', [CheckoutController::class, 'showCustomerDetails'])->name('checkout.customerDetails');
+    Route::post('/checkout/customer-details', [CheckoutController::class, 'saveCustomerDetails']);
+    
+    Route::get('/checkout/payment-method', [CheckoutController::class, 'showPaymentMethod'])->name('checkout.paymentMethod');
+    Route::post('/checkout/payment-method', [CheckoutController::class, 'savePaymentMethod']);
+    
+    Route::post('/checkout/confirmation', [CheckoutController::class, 'showConfirmation'])->name('checkout.confirmation');
+    
+});
+Route::post('/order/complete', [CheckoutController::class, 'completeOrder'])->name('order.complete');
+Route::get('/order/thank-you', function () {
+    return view('checkout.thank-you');
+})->name('order.thankYou');
 
-Route::get('/checkout/payment-method', [CheckoutController::class, 'showPaymentMethod'])->name('checkout.paymentMethod');
-Route::post('/checkout/payment-method', [CheckoutController::class, 'savePaymentMethod']);
-
-Route::get('/checkout/confirmation', [CheckoutController::class, 'showConfirmation'])->name('checkout.confirmation');

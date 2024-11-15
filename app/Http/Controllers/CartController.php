@@ -42,6 +42,7 @@ public function viewCart(){
 
     // Pass cart details to the view
     return view('cart.view', compact('cartItems', 'total'));
+    
 }
 
 
