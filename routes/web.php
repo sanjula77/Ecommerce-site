@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\authController;
 use App\Http\Controllers\productController;
 use App\Http\Controllers\CartController;
+use App\Http\Controllers\CheckoutController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -45,3 +46,21 @@ Route::patch('/cart/update/{item}', [CartController::class, 'updateCart'])->name
 
 // remove items in cart
 Route::delete('/cart/{id}', [CartController::class, 'destroy'])->name('cart.destroy');
+
+
+// Checkout section
+Route::middleware(['auth'])->group(function () {
+    Route::get('/checkout/customer-details', [CheckoutController::class, 'showCustomerDetails'])->name('checkout.customerDetails');
+    Route::post('/checkout/customer-details', [CheckoutController::class, 'saveCustomerDetails']);
+    
+    Route::get('/checkout/payment-method', [CheckoutController::class, 'showPaymentMethod'])->name('checkout.paymentMethod');
+    Route::post('/checkout/payment-method', [CheckoutController::class, 'savePaymentMethod']);
+    
+    Route::post('/checkout/confirmation', [CheckoutController::class, 'showConfirmation'])->name('checkout.confirmation');
+    
+});
+Route::post('/order/complete', [CheckoutController::class, 'completeOrder'])->name('order.complete');
+Route::get('/order/thank-you', function () {
+    return view('checkout.thank-you');
+})->name('order.thankYou');
+
