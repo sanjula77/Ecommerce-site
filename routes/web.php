@@ -18,6 +18,9 @@ Route::get('/register', [authController::class, 'registration'])->name('register
 Route::post('/register', [authController::class, 'registrationPost'])->name('registration.post');
 
 Route::get('/logout', [authController::class, 'logout'])->name('logout');
+Route::get('/user_profile', [authController::class, 'profile'])->name('profile');
+
+Route::post('/user_profile/update', [authController::class, 'updateProfile'])->name('profile.update');
 
 Route::group(['middleware' => 'auth'],function(){
 

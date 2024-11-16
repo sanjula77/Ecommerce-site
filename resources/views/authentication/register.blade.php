@@ -77,6 +77,10 @@
             <input type="text" class="form-control custom-input" id="uName" name="name" placeholder="name" required>
         </div>
 
+        <div class="form-group mb-3">
+            <input type="text" class="form-control custom-input" id="uName" name="username" placeholder="Username" required>
+        </div>
+
         <!-- Password Field -->
         <div class="form-group mb-3">
             <input type="password" class="form-control custom-input" id="password1" name="password" placeholder="Password" required>

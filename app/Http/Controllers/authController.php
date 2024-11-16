@@ -24,7 +24,7 @@ class authController extends Controller
 
         $credentials = $request->only('email', 'password');
         if(Auth::attempt($credentials)){
-            return redirect(route('home'));
+            return redirect(route('products'));
         }
         return redirect(route('login'))->with("error", "Login failed");
     }
@@ -39,11 +39,13 @@ class authController extends Controller
     function registrationPost(Request $request){
         $request->validate([
             'name' =>'required',
+            'username' => 'required|max:12',
             'email' =>'required|email|unique:users',
             'password' => 'required|min:8|confirmed'
         ]);
         
         $data['name'] = $request->name;
+        $data['username'] = $request->username;
         $data['email'] = $request->email;
         $data['password'] = Hash::make($request->password);
         $user = User::create($data); 
@@ -57,4 +59,43 @@ class authController extends Controller
         Auth::logout();
         return redirect()->route('login'); 
     }
+
+    function profile(){
+        return view('authentication.user_profile');
+    }
+
+    public function updateProfile(Request $request)
+    {
+        $request->validate([
+            'full_name' => 'required|string|max:255',
+            'username' => 'nullable|string|max:12|unique:users,username,' . Auth::id(),
+            'email' => 'required|email|unique:users,email,' . Auth::id(),
+            'mobile' => 'nullable|string|max:15',
+            'profile_picture' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+        ]);
+
+        $user = Auth::user();
+
+        $user->name = $request->input('full_name');
+        $user->username = $request->input('username');
+        $user->email = $request->input('email');
+        $user->mobile = $request->input('mobile');
+
+        
+        if ($request->hasFile('profile_picture')) {
+            $file = $request->file('profile_picture');
+            $fileName = time() . '_' . $file->getClientOriginalName();
+            $filePath = $file->storeAs('profile_pictures', $fileName, 'public');
+
+            // Store the file path in the database
+            $user->profile_picture = $filePath;
+        }
+
+        $user->save();
+
+        
+        return redirect()->route('profile');
+    }
+
+
 }
