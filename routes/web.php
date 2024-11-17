@@ -6,6 +6,8 @@ use App\Http\Controllers\authController;
 use App\Http\Controllers\productController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CheckoutController;
+use App\Http\Controllers\forgetPasswordManager;
+
 
 Route::get('/', function () {
     return view('welcome');
@@ -67,3 +69,8 @@ Route::get('/order/thank-you', function () {
     return view('checkout.thank-you');
 })->name('order.thankYou');
 
+
+Route::get("/forget-password", [forgetPasswordManager::class, "forgetpassword"])->name("forget-Password");
+Route::post("/forget-password", [forgetPasswordManager::class, "forgetpasswordPost"])->name("forget-Password-post");
+
+Route:: get("/reset-password/{token}", [forgetPasswordManager::class, "resetPasswords"])->name("reset.password");

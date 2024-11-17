@@ -33,7 +33,7 @@
 
 .profile-section .profile-car img {
     width: 40px; 
-    height: 40px; /
+    height: 40px; 
     border-radius: 50%;
     border: 2px solid #ccc; 
     margin-bottom: 5px; 
