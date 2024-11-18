@@ -48,10 +48,10 @@
 
     <div class="profile-card">
         @if (auth()->user()->profile_picture)
-    <img src="{{ asset('storage/' . auth()->user()->profile_picture) }}" alt="Profile Picture" class="img-thumbnail">
-@else
-    <img src="https://via.placeholder.com/150" alt="Default Profile Picture" class="img-thumbnail">
-@endif
+          <img src="{{ asset('storage/' . auth()->user()->profile_picture) }}" alt="Profile Picture" class="img-thumbnail">
+        @else
+          <img src="https://via.placeholder.com/150" alt="Default Profile Picture" class="img-thumbnail">
+        @endif
 
         <h2>{{ auth()->user()->name }}</h2>
         
