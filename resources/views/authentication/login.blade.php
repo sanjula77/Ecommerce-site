@@ -106,7 +106,7 @@ form{
 
             <div class="mb-3">
                 <input type="password" class="form-control" id="password1" name="password" placeholder="Password">
-                <div id="forgot" class="form-text">Forgot password?</div>
+                <a href="{{route('forget-Password')}}"><div id="forgot" class="form-text">Forgot password?</div></a>
             </div>
 
             <div class="d-flex justify-content-center">
