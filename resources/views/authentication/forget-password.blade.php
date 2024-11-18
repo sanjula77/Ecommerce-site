@@ -34,10 +34,12 @@
         border: none;
         padding: 10px 20px;
         border-radius: 20px;
-        width:100px;
+        width:200px;
+        margin-top: 20px;
     }
     .btn-save:hover {
         background-color: #3a2f29;
+        color: #f9f9f9
     }
     .profile-card .form-control {
         width: 80%; 
@@ -77,9 +79,8 @@
     <p> We will send a link to your email, Use that that link to reset password</p>
     <form action="{{ route('forget-Password-post') }}" method="POST">
         @csrf
-        <label for="email">Email:</label>
-        <input type="email" id="email" name="email" required>
-        <button type="submit">Send Reset Link</button>
+        <input type="email" class="form-control" id="email" name="email" placeholder="email" required>
+        <button type="submit" class="btn btn-save">Send Reset Link</button>
     </form>
     
 </div>

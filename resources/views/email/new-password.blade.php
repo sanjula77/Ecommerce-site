@@ -1,6 +1,6 @@
 @extends('layouts.layout')
 @section('title', 'Password Reset')
-@section('csss')
+@section('csss')  
 <style>
     .profile-card {
         margin-top:200px;
@@ -34,10 +34,11 @@
         border: none;
         padding: 10px 20px;
         border-radius: 20px;
-        width:100px;
+        width:200px;
     }
     .btn-save:hover {
         background-color: #3a2f29;
+        color: #f9f9f9
     }
     .profile-card .form-control {
         width: 80%; 
@@ -79,19 +80,19 @@
         <input type="hidden" name="token" value="{{ $token }}">
         
         <div class="mb-3 text-start">
-            <label for="email">Email:</label>
-            <input type="email" id="email" name="email" required>
+            <label for="email" class="form-label">Email:</label>
+            <input type="email"class="form-control" id="email" name="email" required>
         </div>
         <div class="mb-3 text-start">
-            <label for="password">New Password:</label>
-            <input type="password" id="password" name="password" required>
+            <label for="password" class="form-label">New Password:</label>
+            <input type="password" class="form-control" id="password" name="password" required>
         </div>
         <div class="mb-3 text-start">
-            <label for="password_confirmation">Confirm Password:</label>
-            <input type="password" id="password_confirmation" name="password_confirmation" required>
+            <label for="password_confirmation" class="form-label">Confirm Password:</label>
+            <input type="password" class="form-control" id="password_confirmation" name="password_confirmation" required>
         </div>
         
-        <button type="submit">Reset Password</button>
+        <button type="submit" class="btn btn-save">Reset Password</button>
     </form>
 </div>
 @endsection
