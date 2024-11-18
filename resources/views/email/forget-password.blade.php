@@ -74,7 +74,7 @@
         @endif
     </div>
     
-    <a href="{{route('reset.password', $token)}}"></a>
+    <a href="{{route('reset.password', $token)}}">Reset password</a>
     
 </div>
 

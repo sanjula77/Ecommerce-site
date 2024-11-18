@@ -43,12 +43,11 @@
         width: 80%; 
         margin: auto; 
         font-size: 14px; 
-}
-
+    }
 </style>
 @endsection
-@section('content')
 
+@section('content')
 <div class="profile-card">  
     <div class="mt-5">
         @if($errors->any())
@@ -74,14 +73,25 @@
         @endif
     </div>
     
-    <p> We will send a link to your email, Use that that link to reset password</p>
-    <form action="{{ route('forget-Password-post') }}" method="POST">
+    <p> We will send a link to your email, Use that link to reset password</p>
+    <form action="{{ route('reset-Password-post') }}" method="POST">
         @csrf
-        <label for="email">Email:</label>
-        <input type="email" id="email" name="email" required>
-        <button type="submit">Send Reset Link</button>
+        <input type="hidden" name="token" value="{{ $token }}">
+        
+        <div class="mb-3 text-start">
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" required>
+        </div>
+        <div class="mb-3 text-start">
+            <label for="password">New Password:</label>
+            <input type="password" id="password" name="password" required>
+        </div>
+        <div class="mb-3 text-start">
+            <label for="password_confirmation">Confirm Password:</label>
+            <input type="password" id="password_confirmation" name="password_confirmation" required>
+        </div>
+        
+        <button type="submit">Reset Password</button>
     </form>
-    
 </div>
-
 @endsection

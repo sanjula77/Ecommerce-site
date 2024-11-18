@@ -70,7 +70,9 @@ Route::get('/order/thank-you', function () {
 })->name('order.thankYou');
 
 
-Route::get("/forget-password", [forgetPasswordManager::class, "forgetpassword"])->name("forget-Password");
-Route::post("/forget-password", [forgetPasswordManager::class, "forgetpasswordPost"])->name("forget-Password-post");
+// Reset password
+Route::get("/forget-password", [ForgetPasswordManager::class, "forgetPassword"])->name("forget-Password");
+Route::post("/forget-password", [ForgetPasswordManager::class, "forgetPasswordPost"])->name("forget-Password-post");
+Route::get('/reset-password/{token}', [ForgetPasswordManager::class, 'resetPassword'])->name('reset.password');
+Route::post("/reset-password", [ForgetPasswordManager::class, "resetPasswordPost"])->name("reset-Password-post");
 
-Route:: get("/reset-password/{token}", [forgetPasswordManager::class, "resetPasswords"])->name("reset.password");
