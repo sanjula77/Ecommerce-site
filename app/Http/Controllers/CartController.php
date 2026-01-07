@@ -10,6 +10,9 @@ use Illuminate\Support\Facades\Auth;
 class CartController extends Controller
 {
     public function addToCart(Request $request, $itemId){
+        // Validate that the item exists
+        $item = \App\Models\Item::findOrFail($itemId);
+        
         $user = auth()->user();
         $cartItem = $user->cartItems()->where('item_id', $itemId)->first();
 
@@ -22,8 +25,8 @@ class CartController extends Controller
           ]);
         }
 
-    return redirect()->back()->with('success', 'Item added to cart.');
-}
+        return redirect()->back()->with('success', 'Item added to cart.');
+    }
     
 
 public function viewCart(){
@@ -35,6 +38,11 @@ public function viewCart(){
         ->with('item') // Load item details for each cart item
         ->get();
 
+    // Filter out cart items where the item has been deleted
+    $cartItems = $cartItems->filter(function ($cartItem) {
+        return $cartItem->item !== null;
+    });
+
     // Calculate the total cost
     $total = $cartItems->sum(function ($cartItem) {
         return $cartItem->item->price * $cartItem->quantity;
@@ -42,7 +50,6 @@ public function viewCart(){
 
     // Pass cart details to the view
     return view('cart.view', compact('cartItems', 'total'));
-    
 }
 
 
@@ -52,28 +59,25 @@ public function updateCart(Request $request, $item)
         'quantity' => 'required|integer|min:1'
     ]);
 
-    $cartItem = Cart::where('id', $item)->first();
+    $cartItem = Cart::where('id', $item)
+        ->where('user_id', auth()->id())
+        ->firstOrFail();
 
-    if ($cartItem && $cartItem->user_id === auth()->id()) {
-        $cartItem->quantity = $request->quantity;
-        $cartItem->save();
+    $cartItem->quantity = $request->quantity;
+    $cartItem->save();
 
-return redirect()->back();
-} else {
-        return response()->json(['success' => false, 'message' => 'Unauthorized or cart item not found']);
-    }
+    return redirect()->back()->with('success', 'Cart updated successfully');
 }
 
 public function destroy($id)
 {
-    $cartItem = Cart::find($id);
+    $cartItem = Cart::where('id', $id)
+        ->where('user_id', auth()->id())
+        ->firstOrFail();
 
-    if ($cartItem) {
-        $cartItem->delete();
-        return redirect()->back()->with('success', 'Item removed from the cart.');
-    }
+    $cartItem->delete();
 
-    return redirect()->back()->with('error', 'Item not found in the cart.');
+    return redirect()->back()->with('success', 'Item removed from the cart.');
 }
 
 
