@@ -18,15 +18,16 @@ class authController extends Controller
     }
     function loginPost(Request $request){
         $request->validate([
-            'email' => 'required',
+            'email' => 'required|email',
             'password' => 'required|min:8'
         ]);
 
         $credentials = $request->only('email', 'password');
-        if(Auth::attempt($credentials)){
-            return redirect(route('products'));
+        if(Auth::attempt($credentials, $request->filled('remember'))){
+            $request->session()->regenerate();
+            return redirect(route('products'))->with('success', 'Welcome back!');
         }
-        return redirect(route('login'))->with("error", "Login failed");
+        return redirect(route('login'))->with("error", "Invalid email or password");
     }
 
     function registration(){
@@ -61,6 +62,9 @@ class authController extends Controller
     }
 
     function profile(){
+        if (!Auth::check()) {
+            return redirect()->route('login');
+        }
         return view('authentication.user_profile');
     }
 

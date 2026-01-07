@@ -1,15 +1,28 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use App\Models\Cart;
 use App\Models\Payment;
+use App\Models\Order;
+use App\Models\OrderItem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 
 class CheckoutController extends Controller
 {
     public function showCustomerDetails()
     {
+        $cartItems = Cart::where('user_id', auth()->id())
+            ->with('item')
+            ->get()
+            ->filter(fn($item) => $item->item !== null);
+
+        if ($cartItems->isEmpty()) {
+            return redirect()->route('cart.view')->with('error', 'Your cart is empty.');
+        }
+
         return view('checkout.customer-details');
     }
 
@@ -20,40 +33,50 @@ class CheckoutController extends Controller
             'cardholder_name' => 'required|string|max:255',
             'expiry_date' => 'required|date_format:Y-m',
             'cvv' => 'required|numeric|digits:3',
-            'amount' => 'required|numeric|min:0'
         ]);
 
-        // Retrieve user's cart
-        $cart = Cart::where('user_id', auth()->id())->firstOrFail();
+        // Verify cart has items
+        $cartItems = Cart::where('user_id', auth()->id())
+            ->with('item')
+            ->get()
+            ->filter(fn($item) => $item->item !== null);
 
-        // Save payment details
-        Payment::create([
-            'user_id' => auth()->id(),
-            'cart_id' => $cart->id,
-            'card_number' => $validatedData['card_number'],
-            'cardholder_name' => $validatedData['cardholder_name'],
-            'expiry_date' => $validatedData['expiry_date'],
-            'cvv' => $validatedData['cvv'],
-            'amount' => $validatedData['amount']
+        if ($cartItems->isEmpty()) {
+            return redirect()->route('cart.view')->with('error', 'Your cart is empty.');
+        }
+
+        // Calculate total amount
+        $totalAmount = $cartItems->sum(function ($cart) {
+            return $cart->item->price * $cart->quantity;
+        });
+
+        // Store payment method in session for confirmation
+        session([
+            'payment_method' => $validatedData,
+            'order_total' => $totalAmount
         ]);
 
         return redirect()->route('checkout.confirmation');
-        
     }
 
     public function showPaymentMethod()
     {
-        $userId = Auth::id(); // Get the logged-in user's ID
-    $cartItems = \App\Models\Cart::where('user_id', $userId)->get();
+        $userId = Auth::id();
+        $cartItems = Cart::where('user_id', $userId)
+            ->with('item')
+            ->get()
+            ->filter(fn($item) => $item->item !== null);
 
-    // Calculate total amount
-    $totalAmount = $cartItems->sum(function ($cart) {
-        return $cart->item->price * $cart->quantity; // Ensure `item` relationship exists in Cart model
-    });
+        if ($cartItems->isEmpty()) {
+            return redirect()->route('cart.view')->with('error', 'Your cart is empty.');
+        }
 
-    return view('checkout.payment-method', compact('totalAmount'));
-   
+        // Calculate total amount
+        $totalAmount = $cartItems->sum(function ($cart) {
+            return $cart->item->price * $cart->quantity;
+        });
 
+        return view('checkout.payment-method', compact('totalAmount'));
     }
 
     public function saveCustomerDetails(Request $request)
@@ -68,9 +91,8 @@ class CheckoutController extends Controller
             'postal_code' => 'required|string|max:10'
         ]);
 
-        // Save customer details
-        $user = auth()->user();
-        $user->update($validatedData);
+        // Store customer details in session
+        session(['customer_details' => $validatedData]);
 
         return redirect()->route('checkout.paymentMethod');
     }
@@ -78,32 +100,99 @@ class CheckoutController extends Controller
     public function showConfirmation()
     {
         $user = auth()->user();
-    
-        if ($user && $user->carts->isNotEmpty()) {
-            $subtotal = $user->carts->sum(function ($cart) {
-                return $cart->item->price * $cart->quantity;
-            });
-        } else {
-            $subtotal = 0;
+        $cartItems = Cart::where('user_id', $user->id)
+            ->with('item')
+            ->get()
+            ->filter(fn($item) => $item->item !== null);
+
+        if ($cartItems->isEmpty()) {
+            return redirect()->route('cart.view')->with('error', 'Your cart is empty.');
         }
-    
+
+        $subtotal = $cartItems->sum(function ($cart) {
+            return $cart->item->price * $cart->quantity;
+        });
+
+        $customerDetails = session('customer_details', []);
+        $paymentMethod = session('payment_method', []);
+
         return view('checkout.confirmation', [
-            'total' => $subtotal
+            'total' => $subtotal,
+            'cartItems' => $cartItems,
+            'customerDetails' => $customerDetails,
+            'paymentMethod' => $paymentMethod
         ]);
     }
-     
-   
 
+    public function completeOrder(Request $request)
+    {
+        $user = auth()->user();
+        $cartItems = Cart::where('user_id', $user->id)
+            ->with('item')
+            ->get()
+            ->filter(fn($item) => $item->item !== null);
 
-public function completeOrder(Request $request)
-{
-    $user = auth()->user();
+        if ($cartItems->isEmpty()) {
+            return redirect()->route('cart.view')->with('error', 'Your cart is empty.');
+        }
 
-    $user->carts()->delete();
+        $customerDetails = session('customer_details');
+        $paymentMethod = session('payment_method');
+        $totalAmount = $cartItems->sum(function ($cart) {
+            return $cart->item->price * $cart->quantity;
+        });
 
-    // Redirect to a thank-you page or order summary
-    return redirect()->route('order.thankYou')->with('success', 'Order completed successfully!');
-}
+        if (!$customerDetails || !$paymentMethod) {
+            return redirect()->route('checkout.customerDetails')
+                ->with('error', 'Please complete all checkout steps.');
+        }
 
+        // Create order
+        $order = Order::create([
+            'user_id' => $user->id,
+            'order_number' => 'ORD-' . strtoupper(Str::random(10)),
+            'total_amount' => $totalAmount,
+            'status' => 'pending',
+            'shipping_name' => $customerDetails['name'],
+            'shipping_email' => $customerDetails['email'],
+            'shipping_mobile' => $customerDetails['mobile'],
+            'shipping_address' => $customerDetails['address'],
+            'shipping_province' => $customerDetails['province'],
+            'shipping_city' => $customerDetails['city'],
+            'shipping_postal_code' => $customerDetails['postal_code'],
+        ]);
+
+        // Create order items
+        foreach ($cartItems as $cartItem) {
+            OrderItem::create([
+                'order_id' => $order->id,
+                'item_id' => $cartItem->item_id,
+                'quantity' => $cartItem->quantity,
+                'price' => $cartItem->item->price,
+                'name' => $cartItem->item->name,
+            ]);
+        }
+
+        // Create payment record
+        Payment::create([
+            'user_id' => $user->id,
+            'order_id' => $order->id,
+            'card_number' => $paymentMethod['card_number'],
+            'cardholder_name' => $paymentMethod['cardholder_name'],
+            'expiry_date' => $paymentMethod['expiry_date'],
+            'cvv' => $paymentMethod['cvv'],
+            'amount' => $totalAmount,
+            'payment_status' => 'completed',
+        ]);
+
+        // Clear cart
+        Cart::where('user_id', $user->id)->delete();
+
+        // Clear session data
+        session()->forget(['customer_details', 'payment_method', 'order_total']);
+
+        return redirect()->route('order.thankYou', ['order' => $order->id])
+            ->with('success', 'Order completed successfully!');
+    }
 }
 

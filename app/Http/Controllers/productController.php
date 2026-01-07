@@ -8,8 +8,7 @@ use App\Models\Item;
 class productController extends Controller
 {
     function cards(){
-        $items = Item::all();
+        $items = Item::orderBy('created_at', 'desc')->paginate(12);
         return view('products.item', ['items' => $items]);
-        
     }
 }
